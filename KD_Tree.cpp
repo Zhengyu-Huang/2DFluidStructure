@@ -79,6 +79,7 @@ void KD_Tree::Median_Split(const int partitionIndex,const int firstIndex,const i
  * Data LeftChild RightChild
  */
 void KD_Tree::Print_Tree_Info(){
+    std::cout << " Print Tree Info " << std::endl;
 
     KD_Tree_Node * Node;
     for(int i =0; i < pool.next; i++){

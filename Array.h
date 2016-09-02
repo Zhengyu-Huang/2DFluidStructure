@@ -16,7 +16,7 @@ private:
 
 
 public:
-    int len;
+    int len; //accessible array length
     int bufferSize;
     bool usingExternallyAllocatedPointer;
 
@@ -25,11 +25,20 @@ public:
     Array(int m):usingExternallyAllocatedPointer(false),len(m), bufferSize(m) {basePointer = new T[m];}
 
 
+    Array(const Array<T>& array)
+            :usingExternallyAllocatedPointer(false),basePointer(0),bufferSize(array.len),len(array.len)
+    {
+        basePointer=new T[len];
+        for(int i=0;i<len;i++) basePointer[i]=array.basePointer[i];
+    }
+
+
+
 
 
     int Length() const {return len;}
 
-    ~Array()    {if(!usingExternallyAllocatedPointer)  delete[] basePointer; }
+    ~Array()    { if(!usingExternallyAllocatedPointer)  delete[] basePointer; }
 
     const T& operator[](const int i) const {
 
@@ -48,6 +57,12 @@ public:
     }
 
 
+
+    void Resize(const int newLen,const bool initializeNewElements=true,const bool copyExistingElements=true) {
+        Ensure_Enough_Space(newLen,copyExistingElements);
+        if(initializeNewElements && newLen > len) for(int i=len;i<newLen;i++) basePointer[i]=T();
+        len=newLen;
+    }
 
     int Append(const T& element) {
         Ensure_Enough_Space(len+1);

@@ -6,7 +6,7 @@
 #define INC_2DFLUIDSTRUCTURE_INTEGER_LOG_H
 
 
-
+/*return [log_2 v] */
 inline int Integer_Log(unsigned int v) // this works for any v, but it is slower
 {int c=0;
     if(v&0xffff0000){v>>=16;c|=16;}
