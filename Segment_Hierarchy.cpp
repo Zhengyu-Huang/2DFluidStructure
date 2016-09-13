@@ -3,6 +3,7 @@
 //
 
 #include "Segment_Hierarchy.h"
+
 Segment_Hierarchy::Segment_Hierarchy(const Array<Vector2D<double>> &pointsInput,const Array<Vector2D<int>> &edgeSetInput,
                                    const bool update_boxes):points(pointsInput),edgeSet(edgeSetInput){
 
@@ -30,7 +31,7 @@ void Segment_Hierarchy::Initialize_Hierarchy_Using_KD_Tree() {
     root=this->Initialize_Hierarchy_Using_KD_Tree_Helper(kdTree.rootNode);
     assert(root==2*numLeaves-2);
     boxHierarchy.Resize(root+1);
-    kdTree.Print_Tree_Info();
+    //kdTree.Print_Tree_Info();
     //boxRadius.Resize(root);
 
 }
@@ -64,6 +65,32 @@ void Segment_Hierarchy::Update_Leaf_Boxes(double enlargeThickness){
 void Segment_Hierarchy::Update_Nonleaf_Boxes(){
     for(int i=numLeaves;i<boxHierarchy.len;i++)
         boxHierarchy[i]=Bounding_Box_2D::Combine(boxHierarchy[children[i-numLeaves][0]],boxHierarchy[children[i-numLeaves][1]]);
+}
+
+
+void Segment_Hierarchy::Intersection_List(Bounding_Box_2D &testBox, Array<int> &candidates,double thickness){
+    testBox.Enlarge(thickness);
+    Intersection_List_Helper(root, testBox, candidates, thickness);
+}
+
+void Segment_Hierarchy::Intersection_List_Helper(int root, Bounding_Box_2D testBox, Array<int> &candidates,double thicknessParameter){
+    if(root == 0) return;
+    while(!traversalStack.empty()) traversalStack.pop();
+    traversalStack.push(root);
+    while(!traversalStack.empty()){
+        int current = traversalStack.top();
+        traversalStack.pop();
+        if( !testBox.Intersection(boxHierarchy[current],thicknessParameter) ) continue;
+        if(Leaf(current))
+            candidates.Append(current);
+        else{
+            int box1,box2;
+            children[current-numLeaves].Get(box1,box2);
+            traversalStack.push(box1);
+            traversalStack.push(box2);
+        }
+    }
+
 }
 
 void Segment_Hierarchy::Print_Info(){

@@ -29,6 +29,15 @@ public:
     static Vector2D<T> Componentwise_Max(const Vector2D<T>& v1,const Vector2D<T>& v2)
     {return Vector2D<T>(max(v1.v[0],v2.v[0]),max(v1.v[1],v2.v[1]));}
 
+    bool All_Less_Equal(const Vector2D<T>& v1) const
+    {return v[0]<=v1[0] && v[1]<=v1[1];}
+
+    bool All_Greater_Equal(const Vector2D<T>& v1) const
+    {return v[0]>=v1[0] && v[1]>=v1[1];}
+
+    void Get(T& element1,T& element2) const
+    {element1=v[0];element2=v[1];}
+
 
     Vector2D<T> operator+(const Vector2D<T> & v2) const
     {

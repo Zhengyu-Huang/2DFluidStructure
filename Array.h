@@ -51,6 +51,15 @@ public:
         return basePointer[i];
     }
 
+    Array& operator=(const Array& source) {
+        usingExternallyAllocatedPointer = false;
+        int sourceLen=source.len;
+        if(bufferSize < sourceLen) Resize_Helper(sourceLen,false,false);
+        len=sourceLen;
+        for(int i = 0 ;i<len; i++) (*this)[i]=source[i];
+        return *this;
+    }
+
     void Ensure_Enough_Space(const int newLen,const bool copyExistingElements=true) {
         if(bufferSize < newLen)
             Resize_Helper(4*newLen/3+2,false,copyExistingElements);

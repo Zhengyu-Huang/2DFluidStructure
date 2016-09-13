@@ -9,6 +9,7 @@
 #include "Vector2D.h"
 #include "Array.h"
 #include "KD_Tree.h"
+#include <stack>
 
 class Segment_Hierarchy {
 public:
@@ -32,7 +33,18 @@ public:
     /* Print information of the segment hierarchy */
     void Print_Info();
 
+    mutable std::stack<int> traversalStack; /* used for traverse the segment hierarchy tree */
 
+    /* output is candidates
+     * output all these leaf boxes, which might intersect box.
+     * For the box-box intersection, which is lazy intersection dectection
+     * the testBox is enlarged by thickness
+     */
+    void Intersection_List(Bounding_Box_2D &testBox, Array<int> &candidates,double thickness);
+    void Intersection_List_Helper(int root, Bounding_Box_2D box, Array<int> &candidates,double thicknessParameter);
+
+    /* if box is leaf box return true, else return false */
+    bool Leaf(const int box) const {return box < numLeaves;}
 
     ~Segment_Hierarchy(){};
 private:

@@ -49,6 +49,11 @@ public:
     }
     ~Bounding_Box_2D(){}
 
+    bool Intersection(const Bounding_Box_2D &box,const double thickness_over_two) const {
+        return (minCorner.All_Less_Equal(box.maxCorner) && maxCorner.All_Greater_Equal(box.minCorner));
+    }
+
+
 };
 
 
