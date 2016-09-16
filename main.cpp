@@ -68,6 +68,17 @@ void Intersector_Test(){
         edge[2 * i] = i;
         edge[2 * i + 1] = (i + 1) % numXs;
     }
+    // parallel test
+    double a = 0.5,b=0.9;
+    Xs[0] = a;
+    Xs[1] = b;
+    Xs[2] = -a;
+    Xs[3] = b;
+    Xs[4] = -a;
+    Xs[5] = -b;
+    Xs[6] = a;
+    Xs[7] = -b;
+
 
 
         Intersector intersector(xFluidNum, yFluidNum,Xf, numXs, Xs, numEdge, edge, thickness);
