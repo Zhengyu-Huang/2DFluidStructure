@@ -32,6 +32,7 @@ Intersector::Intersector(int inputXFluidNum, int inputYFluidNum, Vector2D<double
 
 
     bool* intersectOrNot = new bool[numXf];
+    for(int i = 0; i< numXf;i++) intersectOrNot[i] = false;
     Find_Node_Bounding_Boxes();
     Compute_Close_Segments(intersectOrNot, thickness);
     Find_Intersect_Result(intersectOrNot,thickness);
@@ -85,18 +86,25 @@ void Intersector::Recompute(double *inputXs, double thickness) {
 
     if(segmentHierarchy) delete segmentHierarchy;
 
-    for(int i = 0; i<numXs; i++) Xs[i] = Vector2D<double>(inputXs[2*i],inputXs[2*i+1]);
+    for(int i = 0; i<numXs; i++) {
+        Xs_n[i] = Xs[i];
+        Xs[i] = Vector2D<double>(inputXs[2*i],inputXs[2*i+1]);
+    }
     segmentHierarchy = new Segment_Hierarchy(Xs,edgeSet);
 
 
     bool* intersectOrNot = new bool[numXf];
-    Find_Node_Bounding_Boxes();
+    for(int i = 0; i< numXf;i++) intersectOrNot[i] = false;
+
     int intersectNum = Compute_Close_Segments(intersectOrNot, thickness);
 
     for(int i = 0; i < numXf; i++) occlude_n[i] = occlude[i];
     Find_Intersect_Result(intersectOrNot,thickness);
     Compute_Swetp_Nodes(intersectNum, thickness);
-    for(int i = 0; i < numXf; i++) status_n[i] = status[i];
+    for(int i = 0; i < numXf; i++) {
+        status_n[i] = status[i];
+        status[i] = -1;
+    }
     Find_Status();
 
 
@@ -108,6 +116,7 @@ int Intersector::Compute_Close_Segments(bool * intersectOrNot,double thickness)
 {
     int numCloseNodes = 0;
     int shrunkIndex = 0;
+    candidates.Remove_All();
     for(int i=0;i<numXf;++i){
         Array<int> cand;
         Bounding_Box_2D box(boxMin[i],boxMax[i]);
@@ -278,7 +287,7 @@ bool Intersector::Ray_Interaction(double * alpha, double * beta, const Vector2D<
     double delta = v21x*u21y - u21x*v21y;
     //consider the case:parallel lines
     if(delta == 0.0) {
-        std::cout <<"Parallel lines in Ray Interaction" << std::endl;
+        //std::cout <<"Parallel lines in Ray Interaction" << std::endl;
         double alpha1,alpha2;
         bool result1, result2;
         result1 = Point_Inside_Segment(u1, v1, v2, thickness,&alpha1);
@@ -321,7 +330,7 @@ void Intersector::Compute_Swetp_Nodes(const int intersectNum, double thickness){
     for(int i = 0 ; i < intersectNum; i++){
         int fluidNode = backwardMapping[i];
         const Vector2D<double>& fluidNodePosition = Xf[fluidNode];
-        for(int j=0; j<=candidates[i].Length() && !sweptNode[fluidNode];++j){
+        for(int j=0; j<candidates[i].Length() && !sweptNode[fluidNode];++j){
             int segmentID = candidates[i][j];
             Vector2D<double> v1 = Xs[edgeSet[segmentID][0]], v2 = Xs[edgeSet[segmentID][1]];
             Vector2D<double> v1_n = Xs_n[edgeSet[segmentID][0]], v2_n = Xs_n[edgeSet[segmentID][1]];
@@ -329,6 +338,7 @@ void Intersector::Compute_Swetp_Nodes(const int intersectNum, double thickness){
         }
     }
 }
+
 /* consider a ray with start point at p, toward x = +oo
  * if the number of intersections between the ray and edges is odd p is inside the quad
  * otherwise outside
@@ -349,7 +359,7 @@ bool Intersector::Inside_Quad(const Vector2D<double> &p, const Vector2D<double> 
             double delta = pEnd[1] - pStart[1];
             //consider the case:parallel lines
             if(delta == 0.0) {
-                std::cout <<"Parallel lines in InsideQuad" << std::endl;
+                //std::cout <<"Parallel lines in InsideQuad" << std::endl;
                 if (pStart[1] == p[1] && (p[0] - pStart[0])*(p[0] - pEnd[0]) < 0.0)
                     nCross++;
                 continue;
@@ -371,7 +381,7 @@ void Intersector::Find_Status(){
 
     // Easy stuff first
 //#pragma omp parallel for
-    for(int i = 0;numXf;++i)
+    for(int i = 0;i < numXf;++i)
         if(occlude[i]) status[i] = 0;
         else if(!sweptNode[i]&&!occlude_n[i]) status[i]=status_n[i];
 
@@ -478,6 +488,9 @@ void Intersector::Print_Intersector_Info(){
     for (int i = 0; i < numXf; i++)
         if(occlude[i])
             std::cout <<"node " << i << " is occluded" << std::endl;
+    for (int i = 0; i < numXf; i++)
+        if(sweptNode[i])
+            std::cout <<"node " << i << " is swept" << std::endl;
 
     for (int i = 0; i < numXf; i++)
         std::cout <<"status of node " << i << " is " << status[i] << std::endl;
@@ -485,18 +498,22 @@ void Intersector::Print_Intersector_Info(){
 
     std::cout << "HORIZONTAL EDGE" << std::endl;
     for(std::map<int,IntersectionResult>::iterator it = xEdgeResult.begin(); it!=xEdgeResult.end(); ++it){
-        std::cout<<"1Edge: "<< it->first << " intersects: "<<it->second.structureSegmentID[0] <<" at its " <<it->second.edgeCoord[0]
-        << " at " << it->second.structureSegmentCoord[0] <<std::endl;
         if(it->second.structureSegmentID[0] != -1)
-            std::cout<<"2Edge: "<< it->first << " intersects: "<<it->second.structureSegmentID[1] <<" at its " <<it->second.edgeCoord[1]
+        std::cout<<" 1Edge: "<< it->first << " intersects: "<<it->second.structureSegmentID[0] <<" at its " <<it->second.edgeCoord[0]
+        << " at " << it->second.structureSegmentCoord[0] <<std::endl;
+        if(it->second.structureSegmentID[1] != -1)
+            std::cout<<" 2Edge: "<< it->first << " intersects: "<<it->second.structureSegmentID[1] <<" at its " <<it->second.edgeCoord[1]
             << " at " << it->second.structureSegmentCoord[1] <<std::endl;
     }
 
+
+
     std::cout << "VERTICAL EDGE" << std::endl;
     for(std::map<int,IntersectionResult>::iterator it = yEdgeResult.begin(); it!=yEdgeResult.end(); ++it){
+        if(it->second.structureSegmentID[0] != -1)
         std::cout<<"1Edge: "<< it->first << " intersects: "<<it->second.structureSegmentID[0] <<" at its " <<it->second.edgeCoord[0]
         << " at " << it->second.structureSegmentCoord[0] <<std::endl;
-        if(it->second.structureSegmentID[0] != -1)
+        if(it->second.structureSegmentID[1] != -1)
             std::cout<<"2Edge: "<< it->first << " intersects: "<<it->second.structureSegmentID[1] <<" at its " <<it->second.edgeCoord[1]
             << " at " << it->second.structureSegmentCoord[1] <<std::endl;
     }

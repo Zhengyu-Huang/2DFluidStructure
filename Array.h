@@ -82,6 +82,8 @@ public:
     void Remove_All() // if elements are non-primitive this may waste memory
     {len = 0;}
 
+
+
 private:
     void Resize_Helper(const int newSize,const bool initializeNewElements=true,const bool copyExistingElements=true){
 
