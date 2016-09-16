@@ -102,24 +102,43 @@ private:
     /* update edgesRes of fluid edge (startNode, endNode) and bool* occlude*/
     bool Intersect_Result_Helper(int startNode, int endNode, IntersectionResult& edgesRes,double thickness);
 
+    /* check the distance between p and segment v1v2
+     * if distance < thckness return true
+     * the closest point in the segment is v1 + *beta*(v2 -v1)
+     * */
     bool Point_Inside_Segment(const Vector2D<double> &p, const Vector2D<double> &v1, const Vector2D<double> &v2,double thickness,double *beta) const;
+    
     /* compute the intersection point of segment v1v2 and u1u2
      * update alpha and beta
      * the intersection is v1+alpha(v2-v1),  and u1 + beta(u2-u1)
-     * return true if two segments intersect*/
+     * return true if two segments intersect, the distance between two segments are less than thickness
+     * */
     bool Ray_Interaction(double * alpha, double * beta, const Vector2D<double> &v1, const Vector2D<double> &v2,
                           const Vector2D<double> &u1, const Vector2D<double> &u2,double thickness) const;
 
     /* update bool* sweptNode
-     */
+     * if node i is swept by Xs_n and Xs, namely node i is is quad Xs[j] Xs[j+1] and Xs_n[j+1] Xs_n[j]
+     * swept[i] = ture
+     * */
     void Compute_Swetp_Nodes(const int intersectNum, double thickness);
+    /* return whether node p is in quad v1 v2 v2_n v1_n with tolerance thickness
+     * if the distance of the node and the quad is < thickness
+     * regard the node as in the quad
+     * */
     bool Inside_Quad(const Vector2D<double> &p, const Vector2D<double> &v1, const Vector2D<double> &v2,
                     const Vector2D<double> &v1_n, const Vector2D<double> &v2_n,double thickness);
 
 
 
-
+    /* update *int status
+     * for these nodes that are not swept, status[i] = status_n[i]
+     * update the status of ther other nodes by flood fill method
+     * */
     void Find_Status();
+    /* update *int status
+     * Assume node(i,0) is in fluid(active), and
+     * update the status of ther other nodes by flood fill method
+     * */
     void Find_Status_Using_FloodFill();
 
 

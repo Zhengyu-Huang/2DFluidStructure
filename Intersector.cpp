@@ -326,6 +326,7 @@ bool Intersector::Ray_Interaction(double * alpha, double * beta, const Vector2D<
 void Intersector::Compute_Swetp_Nodes(const int intersectNum, double thickness){
 
 
+
     for(int i = 0; i < numXf; i++) sweptNode[i] = false;
     for(int i = 0 ; i < intersectNum; i++){
         int fluidNode = backwardMapping[i];
@@ -346,14 +347,18 @@ void Intersector::Compute_Swetp_Nodes(const int intersectNum, double thickness){
 bool Intersector::Inside_Quad(const Vector2D<double> &p, const Vector2D<double> &v1, const Vector2D<double> &v2,
                              const Vector2D<double> &v1_n, const Vector2D<double> &v2_n,double thickness){
 
-    {
         int nCount = 4;
         Vector2D<double> Points[4] = { v1, v2, v2_n, v1_n };
         int nCross = 0;
+        double beta = 0.0;
+
         for (int i = 0; i < nCount; i++)
         {
             Vector2D<double> pStart = Points[i];
             Vector2D<double> pEnd   = Points[(i + 1) % nCount];
+
+            if(Point_Inside_Segment(p, pStart, pEnd, thickness, &beta)) return true;
+
             double len = sqrt((pEnd[0] - pStart[0])*(pEnd[0] - pStart[0]) + (pEnd[1] - pStart[1])*(pEnd[1] - pStart[1]));
 
             double delta = pEnd[1] - pStart[1];
@@ -366,15 +371,15 @@ bool Intersector::Inside_Quad(const Vector2D<double> &p, const Vector2D<double> 
             }
 
             double alpha = (p[1] - pStart[1])/delta;
-            if(alpha  < -thickness/len || alpha > 1 + thickness/len) continue;
+            if(alpha  < 0 || alpha > 1 ) continue;
             double x = pStart[0] + alpha*(pEnd[0] - pStart[0]);
-            if(x > p[0] - thickness) nCross++;
+            if(x > p[0]) nCross++;
 
         }
 
         // odd number of intersections -> outside, even number of intersections -> inside
         return (nCross % 2 == 1);
-    }
+
 }
 
 void Intersector::Find_Status(){
