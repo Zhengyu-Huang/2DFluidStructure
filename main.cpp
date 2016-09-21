@@ -2,13 +2,54 @@
 //#include <Eigen/Dense>
 //using Eigen::MatrixXd;
 //#include"Segment_Hierarchy.h"
-#include"Intersector.h"
+//#include"Intersector.h"
+#include "MatrixVec.h"
 using namespace std;
 #include <vector>
 #include "Vector2D.h"
 #include "Array.h"
 #include<math.h>
 
+void MatrixVec_Test(){
+    int m = 4, n = 5;
+
+    const int dim=3;
+    MatrixVec<dim> v1(m,n);
+    for(int i = 0; i < m; i++)
+        for(int j = 0; j < n; j++)
+            for(int k = 0; k < dim; k++)
+                v1(i,j)[k] = i*n+j;
+
+    MatrixVec<dim> v2(m,n);
+    for(int i = 0; i < m; i++)
+        for(int j = 0; j < n; j++)
+            for(int k = 0; k < dim; k++)
+                v2(i,j)[k] = k;
+
+    MatrixVec<dim> v3(m,n);
+    for(int i = 0; i < m; i++)
+        for(int j = 0; j < n; j++)
+            for(int k = 0; k < dim; k++)
+                v3(i,j)[k] = 1;
+
+
+
+    MatrixVec<dim> v4(m,n);
+    for(int i = 0; i < m; i++)
+        for(int j = 0; j < n; j++)
+            for(int k = 0; k < dim; k++)
+                v4(i,j)[k] = 0;
+
+    v4 = 2.0*v3 + v3 - v3 + v3 - v3 +2*v3;
+
+    for(int i = 0; i < m; i++)
+        for(int j = 0; j < n; j++)
+                std::cout << "(" <<i <<"," << j << ")" << v4(i,j)[0] <<" " << v4(i,j)[1] << " " << v4(i,j)[2] <<std::endl;
+
+
+
+
+}
 /*
 void Segment_Hierarchy_Test() {
     const double PI = 3.1415926535898;
@@ -48,6 +89,7 @@ void KD_Tree_Test() {
 }
  */
 
+/*
 void Intersector_Test(){
     const double PI = 3.1415926535898;
     int xFluidNum = 5,yFluidNum = xFluidNum;
@@ -70,7 +112,7 @@ void Intersector_Test(){
     }
     // parallel test
     {
-        double a = 0.5, b = 0.9;
+        double a = 0.5, b = 1.0;
         Xs[0] = a;
         Xs[1] = b;
         Xs[2] = -a;
@@ -87,24 +129,26 @@ void Intersector_Test(){
     intersector.Print_Intersector_Info();
 
     {
-        double a = 1.1, b = 1.1;
-        Xs[0] = a;
+        double a1 = -0.1, a2 = -0.3, b = 0.9;
+        Xs[0] = a1;
         Xs[1] = b;
-        Xs[2] = -a;
+        Xs[2] = a2;
         Xs[3] = b;
-        Xs[4] = -a;
+        Xs[4] = a2;
         Xs[5] = -b;
-        Xs[6] = a;
+        Xs[6] = a1;
         Xs[7] = -b;
     }
     intersector.Recompute(Xs, thickness);
     intersector.Print_Intersector_Info();
 
     }
+*/
 int main() {
     //KD_Tree_Test();
     //Segment_Hierarchy_Test();
-      Intersector_Test();
+    //Intersector_Test();
+    MatrixVec_Test();
 
 
 

@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 #INCLUDE_DIRECTORIES ( "${EIGEN3_INCLUDE_DIR}" )
 
 
-set(SOURCE_FILES main.cpp Intersector.cpp Intersector.h Segment_Hierarchy.cpp Segment_Hierarchy.h KD_Tree.cpp KD_Tree.h
+set(SOURCE_FILES main.cpp Intersector.cpp Intersector.h Segment_Hierarchy.cpp Segment_Hierarchy.h KD_Tree.cpp KD_Tree.h MatrixVec.h)
 
-        )
+        #Fluid_Solver.cpp Fluid_Solver.h Structure_Solver.cpp Structure_Solver.h )
 add_executable(2DFluidStructure ${SOURCE_FILES})

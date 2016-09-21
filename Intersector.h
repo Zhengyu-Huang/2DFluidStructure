@@ -107,7 +107,7 @@ private:
      * the closest point in the segment is v1 + *beta*(v2 -v1)
      * */
     bool Point_Inside_Segment(const Vector2D<double> &p, const Vector2D<double> &v1, const Vector2D<double> &v2,double thickness,double *beta) const;
-    
+
     /* compute the intersection point of segment v1v2 and u1u2
      * update alpha and beta
      * the intersection is v1+alpha(v2-v1),  and u1 + beta(u2-u1)

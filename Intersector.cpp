@@ -174,7 +174,7 @@ int Intersector::Find_Intersect_Result(const bool * intersectOrNot,double thickn
     for(int i = 0; i < yFluidNum - 1; i++)
         for(int j = 0; j < xFluidNum; j++){
             // node pair (i*xFluidNum + j, (i+1)*xFluidNum + j)
-            if(intersectOrNot[i*xFluidNum+j] && intersectOrNot[i*xFluidNum + j + 1]) {
+            if(intersectOrNot[i*xFluidNum+j] && intersectOrNot[(i+1)*xFluidNum + j]) {
                 IntersectionResult edgeRes;
                 if(Intersect_Result_Helper(i*xFluidNum + j, (i+1)*xFluidNum + j, edgeRes, thickness)) {
                     yEdgeResult[i * xFluidNum + j] = edgeRes;
@@ -410,26 +410,26 @@ void Intersector::Find_Status(){
                     if(i!=0 && !yEdgeIsIntersect[neighbor] && status[neighbor] > 0){
                         stat=status[neighbor];
                         flags[1]=1;
-                        break;
+
                     }
 
                     neighbor = (i+1)*xFluidNum + j;
                     if(i!=yFluidNum-1 && !yEdgeIsIntersect[myId] && status[neighbor] > 0){
                         stat=status[neighbor];
                         flags[1]=1;
-                        break;
+
                     }
                     neighbor = i*xFluidNum + j - 1;
-                    if(j!=0 && !yEdgeIsIntersect[neighbor] && status[neighbor] > 0){
+                    if(j!=0 && !xEdgeIsIntersect[neighbor] && status[neighbor] > 0){
                         stat=status[neighbor];
                         flags[1]=1;
-                        break;
+
                     }
                     neighbor = i*xFluidNum + j + 1;
-                    if(j!=xFluidNum - 1 && !yEdgeIsIntersect[myId] && status[neighbor] > 0){
+                    if(j!=xFluidNum - 1 && !xEdgeIsIntersect[myId] && status[neighbor] > 0){
                         stat=status[neighbor];
                         flags[1]=1;
-                        break;
+
                     }
                     if(stat == -1) flags[0]=1;
                     else status[i*xFluidNum + j]=stat;
